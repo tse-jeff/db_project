@@ -1,7 +1,17 @@
-SELECT * FROM flight WHERE departure_time > NOW() and departure_date > NOW();
+SELECT airline_name, flight_num, departure_time, departure_date 
+FROM flight
+WHERE departure_date > CURDATE() or (
+    departure_date = CURDATE() and departure_time > CURTIME()
+);
 
-SELECT * FROM flight WHERE flight_status = 'delayed';
+SELECT airline_name, flight_num, departure_time, departure_date
+FROM flight
+WHERE flight_status = 'Delay';
 
-SELECT * FROM customer WHERE email IN (SELECT email FROM purchase);
+SELECT customer.name 
+FROM customer, ticket
+WHERE customer.email = ticket.customer_email;
 
-SELECT * FROM airplane WHERE airline_name = 'Jet Blue';
+SELECT ID, airline_name
+FROM airplane
+WHERE airline_name = 'Jet Blue';
