@@ -32,7 +32,7 @@ VALUES ("Jet Blue", "bobbuild", "135790", "Bob", "Builder", "1995-01-01");
 INSERT INTO Flight(airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, id_num, departure_airport_code, arrival_airport_code,flight_status)
 VALUES ("Jet Blue", "JB123", "2022-11-5", "07:40:00", "2022-11-6", "12:15:00", 15000.00, "15328", "JFK", "PVG","Delay");
 INSERT INTO Flight(airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, id_num, departure_airport_code, arrival_airport_code,flight_status)
-VALUES ("Sprit", "SP456", "2022-11-3", "04:50:00", "2022-11-4", "04:30:00", 275.00, "43525", "SIN", "JFK","Delay");
+VALUES ("Spirit", "SP456", "2022-11-3", "04:50:00", "2022-11-4", "04:30:00", 275.00, "43525", "SIN", "JFK","Delay");
 INSERT INTO Flight(airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, id_num, departure_airport_code, arrival_airport_code,flight_status)
 VALUES ("Singapore Airlines", "SA495", "2022-11-1", "00:01:00", "2022-11-2", "00:13:00", 9999.00, "19324", "SIN", "PVG","On-time");
 
