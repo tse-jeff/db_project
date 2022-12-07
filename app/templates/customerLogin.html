@@ -1,0 +1,10 @@
+<!-- form for customer login input -->
+<form action="/customerLoginAuth" method="post">
+    <input type="email" name="email" placeholder="email" required/> </br>
+    <input type="password" name="password" placeholder="password" required/> </br>
+    <input type="submit" value="Login"/>
+    <!-- report error -->
+    {% if error %}
+        <p><strong>Error: </strong>{{ error }}</p>
+    {% endif %}
+</form>

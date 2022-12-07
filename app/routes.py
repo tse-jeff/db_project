@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = 'secret'
 connection = pymysql.connect(
     host='localhost',
     user='root',
-    password='root',
+    password='',
     db='db_project',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
@@ -28,23 +28,23 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/login')
+@app.route('/customerLogin')
 def login():
-    return render_template('login.html')
+    return render_template('customerLogin.html')
 
 
 @app.route('/loginAuth', methods=['GET', 'POST'])
 def loginAuth():
     # fetch username and password from login form
-    username = request.form['username']
+    email = request.form['email']
     password = request.form['password']
 
     # create cursor
     cursor = connection.cursor()
 
     # execute query
-    query = 'SELECT * FROM user WHERE username = %s and password = %s'
-    cursor.execute(query, (username, hash_password(password)))
+    query = 'SELECT * FROM customer WHERE email = %s and password = %s'
+    cursor.execute(query, (email, hash_password(password)))
 
     # fetch data
     data = cursor.fetchone()
@@ -53,7 +53,7 @@ def loginAuth():
     cursor.close()
 
     if data:
-        session['username'] = username
+        session['username'] = email
         return redirect(url_for('index'))
     else:
         error = 'Invalid username or password'
