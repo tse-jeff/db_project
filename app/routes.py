@@ -29,135 +29,127 @@ def index():
 
 
 # customer routes
-@app.route('/customerLogin')
+@app.route('/customerLogin', methods=['GET', 'POST'])
 def login():
-    return render_template('customerLogin.html')
+    if request.method == 'GET':
+        return render_template('customerLogin.html')
+    elif request.method == 'POST':
+        # fetch username and password from login form
+        email = request.form['email']
+        password = request.form['password']
+
+        # create cursor
+        cursor = connection.cursor()
+
+        # execute query
+        query = 'SELECT * FROM customer WHERE email = %s and password = %s'
+
+        # TODO: use hash password. not hashing for testing
+        cursor.execute(query, (email, hash_password(password)))
+        # cursor.execute(query, (email, password))
+
+        # fetch data
+        data = cursor.fetchone()
+
+        # close cursor
+        cursor.close()
+
+        if data:
+            session['username'] = email
+            return redirect(url_for('index'))
+        else:
+            error = 'Invalid username or password'
+            return render_template('customerLogin.html', error=error)
 
 
-@app.route('/customerLoginAuth', methods=['GET', 'POST'])
-def loginAuth():
-    # fetch username and password from login form
-    email = request.form['email']
-    password = request.form['password']
-
-    # create cursor
-    cursor = connection.cursor()
-
-    # execute query
-    query = 'SELECT * FROM customer WHERE email = %s and password = %s'
-
-    # TODO: use hash password. not hashing for testing
-    # cursor.execute(query, (email, hash_password(password)))
-    cursor.execute(query, (email, password))
-
-    # fetch data
-    data = cursor.fetchone()
-
-    # close cursor
-    cursor.close()
-
-    if data:
-        session['username'] = email
-        return redirect(url_for('index'))
-    else:
-        error = 'Invalid username or password'
-        return render_template('customerLogin.html', error=error)
-
-
-@app.route('/customerRegister')
+@app.route('/customerRegister', methods=['GET', 'POST'])
 def register():
-    return render_template('customerRegister.html')
+    if request.method == 'GET':
+        return render_template('customerRegister.html')
+    elif request.method == 'POST':
+        # fetch username and password from login form
+        email = request.form['email']
+        password = request.form['password']
+        name = request.form['name']
 
+        # create cursor
+        cursor = connection.cursor()
 
-@app.route('/customerRegisterAuth', methods=['GET', 'POST'])
-def registerAuth():
-    # fetch username and password from login form
-    username = request.form['username']
-    password = request.form['password']
-    name = request.form['name']
+        # execute query
+        query = 'INSERT INTO customer (email, password, name) ' + \
+                'VALUES (%s, %s, %s)'
+        cursor.execute(query, (email, hash_password(password), name))
 
-    # create cursor
-    cursor = connection.cursor()
+        # commit to database
+        connection.commit()
 
-    # execute query
-    query = 'INSERT INTO user (username, password, email, phone) ' + \
-            'VALUES (%s, %s, %s, %s)'
-    cursor.execute(query, (username, hash_password(password), name))
+        # close cursor
+        cursor.close()
 
-    # commit to database
-    connection.commit()
-
-    # close cursor
-    cursor.close()
-
-    return redirect(url_for('index'))
+        return redirect(url_for('index'))
 
 
 # staff routes
-@app.route('/staffLogin')
+@app.route('/staffLogin', methods=['GET', 'POST'])
 def staffLogin():
-    return render_template('staffLogin.html')
+    if request.method == 'GET':
+        return render_template('staffLogin.html')
+    elif request.method == 'POST':
+        # fetch username and password from login form
+        username = request.form['username']
+        airline = request.form['airline']
+        password = request.form['password']
+
+        # create cursor
+        cursor = connection.cursor()
+
+        # execute query
+        query = 'SELECT * FROM airline_staff WHERE username = %s and ' + \
+                'airline_name = %s and password = %s'
+        # TODO: use hash password. not hashing for testing
+        # cursor.execute(query, (username, airline, hash_password(password)))
+        cursor.execute(query, (username, airline, password))
+
+        # fetch data
+        data = cursor.fetchone()
+
+        # close cursor
+        cursor.close()
+
+        if data:
+            session['username'] = username
+            return redirect(url_for('index'))
+        else:
+            error = 'Invalid username or password'
+            return render_template('staffLogin.html', error=error)
 
 
-@app.route('/staffLoginAuth', methods=['GET', 'POST'])
-def staffLoginAuth():
-    # fetch username and password from login form
-    username = request.form['username']
-    airline = request.form['airline']
-    password = request.form['password']
-
-    # create cursor
-    cursor = connection.cursor()
-
-    # execute query
-    query = 'SELECT * FROM airline_staff WHERE username = %s and ' + \
-            'airline_name = %s and password = %s'
-    # TODO: use hash password. not hashing for testing
-    # cursor.execute(query, (username, airline, hash_password(password)))
-    cursor.execute(query, (username, airline, password))
-
-    # fetch data
-    data = cursor.fetchone()
-
-    # close cursor
-    cursor.close()
-
-    if data:
-        session['username'] = username
-        return redirect(url_for('index'))
-    else:
-        error = 'Invalid username or password'
-        return render_template('staffLogin.html', error=error)
-
-
-@app.route('/staffRegister')
+@app.route('/staffRegister', methods=['GET', 'POST'])
 def staffRegister():
-    return render_template('staffRegister.html')
+    if request.method == 'GET':
+        return render_template('staffRegister.html')
+    elif request.method == 'POST':
+        # fetch username and password from login form
+        username = request.form['username']
+        airline = request.form['airline']
+        password = request.form['password']
+        name = request.form['name']
 
+        # create cursor
+        cursor = connection.cursor()
 
-@app.route('/staffRegisterAuth', methods=['GET', 'POST'])
-def staffRegisterAuth():
-    # fetch username and password from login form
-    username = request.form['username']
-    airline = request.form['airline']
-    password = request.form['password']
-    name = request.form['name']
+        # execute query
+        query = 'INSERT INTO staff (username, airline, password, name) ' + \
+                'VALUES (%s, %s, %s, %s)'
+        cursor.execute(query, (username, airline, hash_password(password), name))
 
-    # create cursor
-    cursor = connection.cursor()
+        # commit to database
+        connection.commit()
 
-    # execute query
-    query = 'INSERT INTO staff (username, airline, password, name) ' + \
-            'VALUES (%s, %s, %s, %s)'
-    cursor.execute(query, (username, airline, hash_password(password), name))
+        # close cursor
+        cursor.close()
 
-    # commit to database
-    connection.commit()
-
-    # close cursor
-    cursor.close()
-
-    return redirect(url_for('index'))
+        return redirect(url_for('index'))
 
 
 # general routes
