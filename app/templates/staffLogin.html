@@ -1,3 +1,5 @@
+<h1>Staff Login</h1>
+
 <!-- form for airline staff login input -->
 <form action="/staffLoginAuth" method="post">
     <input type="text" name="username" placeholder="username" required/> </br>
@@ -9,3 +11,8 @@
         <p><strong>Error: </strong>{{ error }}</p>
     {% endif %}
 </form>
+
+<!-- button to redirect to staff registration -->
+<br>
+<p>Don't have account yet? Register for an account here.</p>
+<button onclick="window.location.href='/staffRegister'">Register</button>

@@ -1,3 +1,5 @@
+<h1>Customer Login</h1>
+
 <!-- form for customer login input -->
 <form action="/customerLoginAuth" method="post">
     <input type="email" name="email" placeholder="email" required/> </br>
@@ -8,3 +10,8 @@
         <p><strong>Error: </strong>{{ error }}</p>
     {% endif %}
 </form>
+
+<!-- button to redirect to customer registration -->
+<br>
+<p>Don't have account yet? Register for an account here.</p>
+<button onclick="window.location.href='/customerRegister'">Register</button>
