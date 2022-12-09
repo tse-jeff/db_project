@@ -14,11 +14,16 @@
         <li><a href="/flights/3">Flight 3</a></li>
     </ul> -->
     
-
-    <!-- button to redirect to customer login -->
-    <button onclick="window.location.href='/customerLogin'">Customer Login</button>
-    <!-- button to redirect to staff login -->
-    <button onclick="window.location.href='/staffLogin'">Staff Login</button>
+    <!-- if there is username, show logout button -->
+    {% if username %}
+        <h3>Welcome {{username}}</h3>
+        <button onclick="window.location.href='/logout'">Logout</button>
+    {% else %}
+        <!-- button to redirect to customer login -->
+        <button onclick="window.location.href='/customerLogin'">Customer Login</button>
+        <!-- button to redirect to staff login -->
+        <button onclick="window.location.href='/staffLogin'">Staff Login</button>
+    {% endif %}
 </body>
 </html>
 

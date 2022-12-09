@@ -25,7 +25,9 @@ def hash_password(password):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if not session.get('username'):
+        return render_template('index.html')
+    return render_template('index.html', username=session.get('username'))
 
 
 # customer routes
@@ -43,8 +45,8 @@ def login():
         query = 'SELECT * FROM customer WHERE email = %s and password = %s'
 
         # TODO: use hash password. not hashing for testing
-        cursor.execute(query, (email, hash_password(password)))
-        # cursor.execute(query, (email, password))
+        # cursor.execute(query, (email, hash_password(password)))
+        cursor.execute(query, (email, password))
         data = cursor.fetchone()
         cursor.close()
 
@@ -70,7 +72,13 @@ def register():
         # execute query
         query = 'INSERT INTO customer (email, password, name) ' + \
                 'VALUES (%s, %s, %s)'
-        cursor.execute(query, (email, hash_password(password), name))
+        try:
+            # TODO: use hash password. not hashing for testing
+            # cursor.execute(query, (email, hash_password(password), name))
+            cursor.execute(query, (email, password, name))
+        except pymysql.err.IntegrityError as e:
+            connection.rollback()
+            return render_template('customerRegister.html', error=e)
 
         connection.commit()
         cursor.close()
@@ -147,7 +155,8 @@ def staffRegister():
 # general routes
 @app.route('/logout')
 def logout():
-    session.pop('username')
+    # session.pop('username')
+    session['username'] = None
     return redirect(url_for('index'))
 
 
