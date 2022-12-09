@@ -30,11 +30,14 @@ def index():
     else:
         # refreshes the flights
         purchased_tickets()
+        session['route'] = '/'
         return render_template(
             'index.html',
             username=session.get('username'),
             is_staff=session.get('is_staff'),
-            flights=session.get('flights')
+            flights=session.get('flights'),
+            total_price=session.get('total_price'),
+            route=session.get('route')
         )
 
 
@@ -178,10 +181,64 @@ def staffLogin():
         if data:
             session['username'] = username
             session['is_staff'] = True
+            session['flights'] = get_all_future_flights(airline)
             return redirect(url_for('index'))
         else:
             error = 'Invalid username or password'
             return render_template('staffLogin.html', error=error)
+
+
+@app.route('/createFlight', methods=['GET', 'POST'])
+def createFlight():
+    if request.method == 'GET':
+        return render_template('createFlight.html')
+    elif request.method == 'POST':
+        # fetch flight info from form
+        airline = request.form['airline_name']
+        flight_num = request.form['flight_num']
+        departure_airport = request.form['departure_airport_code']
+        departure_date = request.form['departure_date']
+        departure_time = request.form['departure_time']
+        arrival_airport = request.form['arrival_airport_code']
+        arrival_date = request.form['arrival_date']
+        arrival_time = request.form['arrival_time']
+        status = request.form['flight_status']
+        price = request.form['base_price']
+        id_num = request.form['id_num']
+        cursor = connection.cursor()
+
+        # execute query
+        query = 'INSERT INTO flight (airline_name, flight_num, ' + \
+                'departure_airport_code, departure_date, departure_time, ' + \
+                'arrival_airport_code, arrival_date, arrival_time, ' + \
+                'flight_status, base_price, id_num) ' + \
+                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        try:
+            cursor.execute(query, (airline, flight_num, departure_airport,
+                                   departure_date, departure_time,
+                                   arrival_airport, arrival_date,
+                                   arrival_time, status, price, id_num))
+        except pymysql.err.IntegrityError as e:
+            connection.rollback()
+            return render_template('createFlight.html', error=e)
+        connection.commit()
+        cursor.close()
+        return redirect(url_for('index'))
+
+
+
+def get_all_future_flights(airline_name):
+    cursor = connection.cursor()
+    query = 'SELECT * FROM flight WHERE airline_name = %s AND ' + \
+            'departure_date > CURDATE()'
+    cursor.execute(query, (airline_name))
+    flights = cursor.fetchall()
+    cursor.close()
+
+    for flight in flights:
+        datetime_to_string(flight)
+
+    return flights
 
 
 @app.route('/staffRegister', methods=['GET', 'POST'])
@@ -229,6 +286,7 @@ def logout():
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    session['route'] = 'search'
     if request.method == 'GET':
         return render_template('search.html')
     elif request.method == 'POST':
@@ -255,8 +313,6 @@ def search():
         # if there is a WHERE clause, remove the last AND
         if departure_airport or arrival_airport or departure_date or arrival_date:
             query = query[:-4]
-        
-        print(query)
 
         cursor.execute(query)
         search = cursor.fetchall()
@@ -272,6 +328,7 @@ def search():
 
 @app.route('/flights')
 def flights():
+    session['route'] = 'flights'
     return render_template('flights.html', flights=session['search'])
     # return "hello world"
 

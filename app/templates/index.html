@@ -12,7 +12,40 @@
         <h3>Welcome {{username}}</h3>
         <button onclick="window.location.href='/logout'">Logout</button>
         {% if staff %}
+            <!-- show future flights -->
+            <table>
+                <tr>
+                    <th>airline_name</th>
+                    <th>flight_num</th>
+                    <th>departure_airport_code</th>
+                    <th>departure_date</th>
+                    <th>departure_time</th>
+                    <th>arrival_airport_code</th>
+                    <th>arrival_date</th>
+                    <th>arrival_time</th>
+                    <th>base_price</th>
+                    <th>id_num</th>
+                    <th>flight_status</th>
+                </tr>
+                {% for flight in flights %}
+                    <tr>
+                        <td>{{flight.airline_name}}</td>
+                        <td>{{flight.flight_num}}</td>
+                        <td>{{flight.departure_airport_code}}</td>
+                        <td>{{flight.departure_date}}</td>
+                        <td>{{flight.departure_time}}</td>
+                        <td>{{flight.arrival_airport_code}}</td>
+                        <td>{{flight.arrival_date}}</td>
+                        <td>{{flight.arrival_time}}</td>
+                        <td>{{flight.base_price}}</td>
+                        <td>{{flight.id_num}}</td>
+                        <td>{{flight.flight_status}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
 
+            <!-- button for creating a flight -->
+            <button onclick="window.location.href='/createFlight'">Create Flight</button>
         {% else %}
             <!-- show purchased tickets -->
             <h2>Purchased Tickets</h2>
