@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block content %}
+    <h1>Flights</h1>
+    <table>
+        <tr>
+            <th>Flight Number</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th>Departure Time</th>
+            <th>Arrival Time</th>
+            <th>Price</th>
+            <th>Seats Available</th>
+            <th>Book</th>
+        </tr>
+        {% for flight in flights %}
+            <tr>
+                <td>{{flight.flight_number}}</td>
+                <td>{{flight.departure}}</td>
+                <td>{{flight.arrival}}</td>
+                <td>{{flight.departure_time}}</td>
+                <td>{{flight.arrival_time}}</td>
+                <td>{{flight.price}}</td>
+                <td>{{flight.seats_available}}</td>
+                <!-- <td><button onclick="window.location.href='/book/{{flight.flight_number}}'">Book</button></td> -->
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

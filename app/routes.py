@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 import sys
 import pymysql.cursors
 import hashlib
+from datetime import datetime, date
 
 app = Flask(__name__)
 sys.path.append('..')
@@ -27,7 +28,15 @@ def hash_password(password):
 def index():
     if not session.get('username'):
         return render_template('index.html')
-    return render_template('index.html', username=session.get('username'))
+    else:
+        purchased_tickets()
+        print(session['flights'])
+        return render_template(
+            'index.html',
+            username=session.get('username'),
+            is_staff=session.get('is_staff'),
+            flights=session.get('flights')
+        )
 
 
 # customer routes
@@ -52,10 +61,51 @@ def login():
 
         if data:
             session['username'] = email
+            session['is_staff'] = False
+
             return redirect(url_for('index'))
         else:
             error = 'Invalid username or password'
             return render_template('customerLogin.html', error=error)
+
+
+def purchased_tickets():
+    cursor = connection.cursor()
+    query = 'SELECT ticket_id FROM purchase WHERE email = %s'
+    cursor.execute(query, session.get('username'))
+    ticket_ids = cursor.fetchall()
+    session['ticket_ids'] = ticket_ids
+    print(ticket_ids)
+
+    flights = []
+    # find all flight_num from ticket_ids
+    for ticket_id in ticket_ids:
+        query = 'SELECT flight_num FROM ticket WHERE ID = %s'
+        cursor.execute(query, ticket_id['ticket_id'])
+        flights.append(cursor.fetchone())
+
+    # add flight info to flights
+    for flight in flights:
+        query = 'SELECT * FROM flight WHERE flight_num = %s'
+        cursor.execute(query, flight['flight_num'])
+        flight.update(cursor.fetchone())
+    
+    # convert all datetime to string
+    for flight in flights:
+        flight['departure_date'] = flight['departure_date'].isoformat()
+        flight['arrival_date'] = flight['arrival_date'].isoformat()
+        flight['departure_time'] = str(flight['departure_time'])
+        flight['arrival_time'] = str(flight['arrival_time'])
+
+    # add ticket info to flights
+    for flight in flights:
+        query = 'SELECT class, sold_price FROM ticket ' + \
+                'WHERE flight_num = %s AND customer_email = %s'
+        cursor.execute(query, (flight['flight_num'], session['username']))
+        flight.update(cursor.fetchone())
+
+    cursor.close()
+    session['flights'] = flights
 
 
 @app.route('/customerRegister', methods=['GET', 'POST'])
@@ -110,6 +160,7 @@ def staffLogin():
 
         if data:
             session['username'] = username
+            session['is_staff'] = True
             return redirect(url_for('index'))
         else:
             error = 'Invalid username or password'
@@ -156,7 +207,8 @@ def staffRegister():
 @app.route('/logout')
 def logout():
     # session.pop('username')
-    session['username'] = None
+    # session['username'] = None
+    session.clear()
     return redirect(url_for('index'))
 
 

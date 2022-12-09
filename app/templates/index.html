@@ -7,23 +7,61 @@
 
 <body>
     <h1>Airline</h1>
-    <!-- <h2>Flights</h2>
-    <ul>
-        <li><a href="/flights/1">Flight 1</a></li>
-        <li><a href="/flights/2">Flight 2</a></li>
-        <li><a href="/flights/3">Flight 3</a></li>
-    </ul> -->
-    
     <!-- if there is username, show logout button -->
     {% if username %}
         <h3>Welcome {{username}}</h3>
         <button onclick="window.location.href='/logout'">Logout</button>
+        {% if staff %}
+
+        {% else %}
+            <!-- show purchased tickets -->
+            <h2>Purchased Tickets</h2>
+            <table>
+                <tr>
+                    <th>class</th>
+                    <th>airline_name</th>
+                    <th>flight_num</th>
+                    <th>departure_airport_code</th>
+                    <th>departure_date</th>
+                    <th>departure_time</th>
+                    <th>arrival_airport_code</th>
+                    <th>arrival_date</th>
+                    <th>arrival_time</th>
+                    <th>flight_status</th>
+                    <th>price</th>
+                </tr>
+                {% for flight in flights %}
+                    <tr>
+                        <td>{{flight.class}}</td>
+                        <td>{{flight.airline_name}}</td>
+                        <td>{{flight.flight_num}}</td>
+                        <td>{{flight.departure_airport_code}}</td>
+                        <td>{{flight.departure_date}}</td>
+                        <td>{{flight.departure_time}}</td>
+                        <td>{{flight.arrival_airport_code}}</td>
+                        <td>{{flight.arrival_date}}</td>
+                        <td>{{flight.arrival_time}}</td>
+                        <td>{{flight.flight_status}}</td>
+                        <td>{{flight.sold_price}}</td>
+                    </tr>
+                {% endfor %}
+        {% endif %}
     {% else %}
         <!-- button to redirect to customer login -->
         <button onclick="window.location.href='/customerLogin'">Customer Login</button>
         <!-- button to redirect to staff login -->
         <button onclick="window.location.href='/staffLogin'">Staff Login</button>
     {% endif %}
+
+    <!-- search for flights -->
+    <!-- <h2>Search for Flights</h2>
+    <form action="/search" method="post">
+        <input type="text" name="departure" placeholder="departure" required/> </br>
+        <input type="text" name="arrival" placeholder="arrival" required/> </br>
+        <input type="date" name="departure_date" placeholder="departure date" required/> </br>
+        <input type="submit" value="Search"/>
+    </form> -->
+
 </body>
 </html>
 
