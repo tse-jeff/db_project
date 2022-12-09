@@ -1,0 +1,16 @@
+<h1>Add Plane</h1>
+<!-- link to go back home -->
+<a href="/">Home</a>
+
+<form action="/addPlane" method="post">
+    <input type="text" name="airline_name" placeholder="airline" required/> </br>
+    <input type="text" name="seats_num" placeholder="seats" required/> </br>
+    <input type="text" name="manufacture_company" placeholder="manufacture company" required/> </br>
+    <input type="number" name="age_place" placeholder="age place" required/> </br>
+    <input type="number" name="ID" placeholder="ID" required/> </br>
+    <input type="submit" value="Add"/>
+    <!-- report error -->
+    {% if error %}
+        <p><strong>Error: </strong>{{ error }}</p>
+    {% endif %}
+</form>
