@@ -37,8 +37,6 @@ def login():
         # fetch username and password from login form
         email = request.form['email']
         password = request.form['password']
-
-        # create cursor
         cursor = connection.cursor()
 
         # execute query
@@ -47,11 +45,7 @@ def login():
         # TODO: use hash password. not hashing for testing
         cursor.execute(query, (email, hash_password(password)))
         # cursor.execute(query, (email, password))
-
-        # fetch data
         data = cursor.fetchone()
-
-        # close cursor
         cursor.close()
 
         if data:
@@ -67,12 +61,10 @@ def register():
     if request.method == 'GET':
         return render_template('customerRegister.html')
     elif request.method == 'POST':
-        # fetch username and password from login form
+        # fetch username and password from register form
         email = request.form['email']
         password = request.form['password']
         name = request.form['name']
-
-        # create cursor
         cursor = connection.cursor()
 
         # execute query
@@ -80,12 +72,8 @@ def register():
                 'VALUES (%s, %s, %s)'
         cursor.execute(query, (email, hash_password(password), name))
 
-        # commit to database
         connection.commit()
-
-        # close cursor
         cursor.close()
-
         return redirect(url_for('index'))
 
 
@@ -99,8 +87,6 @@ def staffLogin():
         username = request.form['username']
         airline = request.form['airline']
         password = request.form['password']
-
-        # create cursor
         cursor = connection.cursor()
 
         # execute query
@@ -112,8 +98,6 @@ def staffLogin():
 
         # fetch data
         data = cursor.fetchone()
-
-        # close cursor
         cursor.close()
 
         if data:
@@ -129,26 +113,34 @@ def staffRegister():
     if request.method == 'GET':
         return render_template('staffRegister.html')
     elif request.method == 'POST':
-        # fetch username and password from login form
-        username = request.form['username']
+        # fetch username and password from registration form
         airline = request.form['airline']
+        username = request.form['username']
         password = request.form['password']
-        name = request.form['name']
-
-        # create cursor
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
         cursor = connection.cursor()
 
         # execute query
-        query = 'INSERT INTO staff (username, airline, password, name) ' + \
-                'VALUES (%s, %s, %s, %s)'
-        cursor.execute(query, (username, airline, hash_password(password), name))
+        query = 'INSERT INTO airline_staff ' + \
+                '(airline_name, username, password, ' + \
+                'first_name, last_name) ' + \
+                'VALUES (%s, %s, %s, %s, %s)'
 
-        # commit to database
+        # try to execute query, if error, rollback
+        try:
+            # TODO: use hash password. not hashing for testing
+            cursor.execute(query, (airline, username, password,
+                                   first_name, last_name))
+        except pymysql.err.IntegrityError as e:
+            connection.rollback()
+            # foreign key error means invalid airline name
+            if e.args[0] == 1452:
+                e = 'Invalid airline name'
+            return render_template('staffRegister.html', error=e)
+
         connection.commit()
-
-        # close cursor
         cursor.close()
-
         return redirect(url_for('index'))
 
 

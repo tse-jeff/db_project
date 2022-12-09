@@ -2,9 +2,12 @@
 
 <!-- register staff account form -->
 <form action="/staffRegister" method="post">
+    <input type="text" name="airline" placeholder="airline" required/> </br>
     <input type="text" name="username" placeholder="username" required/> </br>
     <input type="password" name="password" placeholder="password" required/> </br>
-    <input type="name" name="name" placeholder="name" required/> </br>
+    <input type="text" name="first_name" placeholder="first_name" required/> </br>
+    <input type="text" name="last_name" placeholder="last_name" required/> </br>
+    <input type="date" name="date of birth" placeholder="date of birth"/> </br>
     <input type="submit" value="Register"/>
     <!-- report error -->
     {% if error %}
