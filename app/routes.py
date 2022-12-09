@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, session, redirect, url_for
 import sys
 import pymysql.cursors
 import hashlib
-from datetime import datetime, date
 
 app = Flask(__name__)
 sys.path.append('..')
@@ -29,8 +28,8 @@ def index():
     if not session.get('username'):
         return render_template('index.html')
     else:
+        # refreshes the flights
         purchased_tickets()
-        print(session['flights'])
         return render_template(
             'index.html',
             username=session.get('username'),
@@ -69,13 +68,23 @@ def login():
             return render_template('customerLogin.html', error=error)
 
 
+# function to convert all dates to string in a flight
+def datetime_to_string(flight):
+    flight['departure_date'] = flight['departure_date'].isoformat()
+    flight['arrival_date'] = flight['arrival_date'].isoformat()
+    if flight['departure_time']:
+        flight['departure_time'] = str(flight['departure_time'])
+    if flight['arrival_time']:
+        flight['arrival_time'] = str(flight['arrival_time'])
+
+
 def purchased_tickets():
     cursor = connection.cursor()
     query = 'SELECT ticket_id FROM purchase WHERE email = %s'
     cursor.execute(query, session.get('username'))
     ticket_ids = cursor.fetchall()
     session['ticket_ids'] = ticket_ids
-    print(ticket_ids)
+    session['total_price'] = 0
 
     flights = []
     # find all flight_num from ticket_ids
@@ -89,13 +98,10 @@ def purchased_tickets():
         query = 'SELECT * FROM flight WHERE flight_num = %s'
         cursor.execute(query, flight['flight_num'])
         flight.update(cursor.fetchone())
-    
+
     # convert all datetime to string
     for flight in flights:
-        flight['departure_date'] = flight['departure_date'].isoformat()
-        flight['arrival_date'] = flight['arrival_date'].isoformat()
-        flight['departure_time'] = str(flight['departure_time'])
-        flight['arrival_time'] = str(flight['arrival_time'])
+        datetime_to_string(flight)
 
     # add ticket info to flights
     for flight in flights:
@@ -103,9 +109,20 @@ def purchased_tickets():
                 'WHERE flight_num = %s AND customer_email = %s'
         cursor.execute(query, (flight['flight_num'], session['username']))
         flight.update(cursor.fetchone())
+        session['total_price'] += flight['sold_price']
 
     cursor.close()
     session['flights'] = flights
+
+
+@app.route('/cancel/<ticket_id>')
+def cancel(ticket_id):
+    cursor = connection.cursor()
+    query = 'DELETE FROM purchase WHERE ticket_id = %s'
+    cursor.execute(query, ticket_id)
+    connection.commit()
+    cursor.close()
+    return redirect(url_for('index'))
 
 
 @app.route('/customerRegister', methods=['GET', 'POST'])
@@ -206,10 +223,57 @@ def staffRegister():
 # general routes
 @app.route('/logout')
 def logout():
-    # session.pop('username')
-    # session['username'] = None
     session.clear()
     return redirect(url_for('index'))
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'GET':
+        return render_template('search.html')
+    elif request.method == 'POST':
+        print(request.form)
+        departure_airport = request.form['departure_airport_code']
+        arrival_airport = request.form['arrival_airport_code']
+        departure_date = request.form['departure_date']
+        arrival_date = request.form['arrival_date']
+        
+        # search for flights
+        cursor = connection.cursor()
+        query = 'SELECT * FROM flight'
+        # if any of the fields are filled, add WHERE clause
+        if departure_airport or arrival_airport or departure_date or arrival_date:
+            query += ' WHERE '
+        if departure_airport:
+            query += 'departure_airport_code = \'%s\' AND ' % departure_airport
+        if arrival_airport:
+            query += 'arrival_airport_code = \'%s\' AND ' % arrival_airport
+        if departure_date:
+            query += 'departure_date = \'%s\' AND ' % departure_date
+        if arrival_date:
+            query += 'arrival_date = \'%s\' AND ' % arrival_date
+        # if there is a WHERE clause, remove the last AND
+        if departure_airport or arrival_airport or departure_date or arrival_date:
+            query = query[:-4]
+        
+        print(query)
+
+        cursor.execute(query)
+        search = cursor.fetchall()
+        cursor.close()
+
+        # convert all datetime to string
+        for flight in search:
+            datetime_to_string(flight)
+
+        session['search'] = search
+        return redirect(url_for('flights'))
+
+
+@app.route('/flights')
+def flights():
+    return render_template('flights.html', flights=session['search'])
+    # return "hello world"
 
 
 if __name__ == '__main__':

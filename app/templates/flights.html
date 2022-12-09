@@ -1,28 +1,36 @@
-{% extends "index.html" %}
-{% block content %}
-    <h1>Flights</h1>
-    <table>
+<!-- extend search.html -->
+{% extends "search.html" %} {% block search %}
+<h2>flights</h2>
+
+<table>
+    <tr>
+        <th>airline_name</th>
+        <th>flight_num</th>
+        <th>departure_airport_code</th>
+        <th>departure_date</th>
+        <th>departure_time</th>
+        <th>arrival_airport_code</th>
+        <th>arrival_date</th>
+        <th>arrival_time</th>
+        <th>base_price</th>
+        <th>id_num</th>
+        <th>flight_status</th>
+    </tr>
+    {% for flight in flights %}
         <tr>
-            <th>Flight Number</th>
-            <th>Departure</th>
-            <th>Arrival</th>
-            <th>Departure Time</th>
-            <th>Arrival Time</th>
-            <th>Price</th>
-            <th>Seats Available</th>
-            <th>Book</th>
+            <td>{{flight.airline_name}}</td>
+            <td>{{flight.flight_num}}</td>
+            <td>{{flight.departure_airport_code}}</td>
+            <td>{{flight.departure_date}}</td>
+            <td>{{flight.departure_time}}</td>
+            <td>{{flight.arrival_airport_code}}</td>
+            <td>{{flight.arrival_date}}</td>
+            <td>{{flight.arrival_time}}</td>
+            <td>{{flight.base_price}}</td>
+            <td>{{flight.id_num}}</td>
+            <td>{{flight.flight_status}}</td>
         </tr>
-        {% for flight in flights %}
-            <tr>
-                <td>{{flight.flight_number}}</td>
-                <td>{{flight.departure}}</td>
-                <td>{{flight.arrival}}</td>
-                <td>{{flight.departure_time}}</td>
-                <td>{{flight.arrival_time}}</td>
-                <td>{{flight.price}}</td>
-                <td>{{flight.seats_available}}</td>
-                <!-- <td><button onclick="window.location.href='/book/{{flight.flight_number}}'">Book</button></td> -->
-            </tr>
-        {% endfor %}
-    </table>
+    {% endfor %}
+</table>
+
 {% endblock %}

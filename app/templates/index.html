@@ -44,7 +44,11 @@
                         <td>{{flight.flight_status}}</td>
                         <td>{{flight.sold_price}}</td>
                     </tr>
+                    <!-- button that cancels ticket -->
+                    <button onclick="window.location.href='/cancel/{{flight.ticket_id}}'">Cancel</button>
                 {% endfor %}
+                <!-- display total_price -->
+                <h3>Total Price: {{total_price}}</h3>
         {% endif %}
     {% else %}
         <!-- button to redirect to customer login -->
@@ -53,14 +57,8 @@
         <button onclick="window.location.href='/staffLogin'">Staff Login</button>
     {% endif %}
 
-    <!-- search for flights -->
-    <!-- <h2>Search for Flights</h2>
-    <form action="/search" method="post">
-        <input type="text" name="departure" placeholder="departure" required/> </br>
-        <input type="text" name="arrival" placeholder="arrival" required/> </br>
-        <input type="date" name="departure_date" placeholder="departure date" required/> </br>
-        <input type="submit" value="Search"/>
-    </form> -->
+    <!-- button to redirect to search -->
+    <button onclick="window.location.href='/search'">Search for flights</button>
 
 </body>
 </html>

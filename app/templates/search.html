@@ -1,0 +1,16 @@
+<h1>Flight Search</h1>
+{% if username %}
+    <h3>Welcome {{username}}</h3>
+    <button onclick="window.location.href='/logout'">Logout</button>
+{% endif %}
+
+<form action="/search" method="post">
+    <input type="text" name="departure_airport_code" placeholder="Departure Airport Code"/> </br>
+    <input type="text" name="arrival_airport_code" placeholder="Arrival Airport Code"/> </br>
+    <input type="date" name="departure_date" placeholder="Departure Date"/> </br>
+    <input type="date" name="arrival_date" placeholder="Arrival Date"/> </br>
+    <input type="submit" value="Search"/>
+</form>
+
+<!-- block to be changed -->
+{% block search %}{% endblock %}
