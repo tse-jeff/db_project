@@ -45,7 +45,7 @@ CREATE TABLE Airport(
 	code VARCHAR(5) NOT NULL,
 	name VARCHAR(255),
 	city VARCHAR(255),
-	county VARCHAR(255),
+	country VARCHAR(255),
 	airport_type VARCHAR(50),
 	
 	PRIMARY KEY (code)
